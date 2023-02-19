@@ -9,6 +9,8 @@ from gradio.processing_utils import decode_base64_to_file
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Request, Response
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from secrets import compare_digest
+import numpy as np
+import modules
 
 import modules.shared as shared
 from modules import sd_samplers, deepbooru, sd_hijack, images, scripts, ui, postprocessing
@@ -61,6 +63,8 @@ def decode_base64_to_image(encoding):
         raise HTTPException(status_code=500, detail="Invalid encoded image")
 
 def encode_pil_to_base64(image):
+    if type(image) == np.ndarray:
+        image = Image.fromarray(np.uint8(image))
     with io.BytesIO() as output_bytes:
 
         if opts.samples_format.lower() == 'png':
@@ -113,6 +117,8 @@ def api_middleware(app: FastAPI):
 
 class Api:
     def __init__(self, app: FastAPI, queue_lock: Lock):
+        modules.scripts.scripts_current = modules.scripts.scripts_txt2img
+        modules.scripts.scripts_txt2img.initialize_scripts(is_img2img=False)
         if shared.cmd_opts.api_auth:
             self.credentials = dict()
             for auth in shared.cmd_opts.api_auth.split(","):
