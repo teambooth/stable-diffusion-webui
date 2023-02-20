@@ -11,6 +11,7 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from secrets import compare_digest
 import numpy as np
 import modules
+import sys
 
 import modules.shared as shared
 from modules import sd_samplers, deepbooru, sd_hijack, images, scripts, ui, postprocessing
@@ -156,6 +157,7 @@ class Api:
         self.add_api_route("/sdapi/v1/train/embedding", self.train_embedding, methods=["POST"], response_model=TrainResponse)
         self.add_api_route("/sdapi/v1/train/hypernetwork", self.train_hypernetwork, methods=["POST"], response_model=TrainResponse)
         self.add_api_route("/sdapi/v1/memory", self.get_memory, methods=["GET"], response_model=MemoryResponse)
+        self.add_api_route("/sdapi/v1/kill", self.kill, methods=["GET"])
 
     def add_api_route(self, path: str, endpoint, **kwargs):
         if shared.cmd_opts.api_auth:
@@ -517,6 +519,9 @@ class Api:
         except AssertionError as msg:
             shared.state.end()
             return TrainResponse(info="train embedding error: {error}".format(error=error))
+
+    def kill(self):
+        sys.exit()
 
     def get_memory(self):
         try:
