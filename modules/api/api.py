@@ -246,6 +246,8 @@ class Api:
             p = StableDiffusionProcessingImg2Img(sd_model=shared.sd_model, **args)
             p.init_images = [decode_base64_to_image(x) for x in init_images]
 
+            p.scripts = scripts.scripts_img2img
+
             shared.state.begin()
             if script is not None:
                 p.outpath_grids = opts.outdir_img2img_grids
