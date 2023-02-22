@@ -120,6 +120,7 @@ class Api:
     def __init__(self, app: FastAPI, queue_lock: Lock):
         modules.scripts.scripts_current = modules.scripts.scripts_txt2img
         modules.scripts.scripts_txt2img.initialize_scripts(is_img2img=False)
+        modules.scripts.scripts_img2img.initialize_scripts(is_img2img=True)
         if shared.cmd_opts.api_auth:
             self.credentials = dict()
             for auth in shared.cmd_opts.api_auth.split(","):
